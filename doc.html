@@ -76,7 +76,7 @@
             </style>
         </head>
         <body>
-            <h1>🎤 Audio Processing API Documentation</h1>
+            <h1>🎤 Ai Crafters Audio Processing API Documentation</h1>
             <p>Welcome to the Audio Processing API documentation! This API allows you to process audio files using AI analysis with Gemini 2.0. Below are the details on how to use the API.</p>
             <p>To get started, you can use the API to transcribe audio files, analyze their content, and much more. The API is designed to be simple and efficient, allowing you to integrate audio processing capabilities into your applications seamlessly.</p>
             <p>For any questions or support, feel free to reach out to us!</p>
@@ -86,7 +86,7 @@
             <div class="endpoint">
                 <h2>🌐 Base URL</h2>
                 <p>The API is accessible at:</p>
-                <pre><code>http://audio-app.vercel.app</code></pre>
+                <pre><code>https://aicrafters-audio-api.vercel.app</code></pre>
             </div>
 
 
@@ -224,7 +224,7 @@
             const message = document.getElementById('promptInput').value || "Transcribe this audio, and use multi-languages if detected, and return only the clean multi-langueges transcription, no more, no less and no other text, and no explanation, and no translation, and no summary, and no other information, just the transcription.";
 
             try {
-                const response = await fetch('http://audio-app.vercel.app/Transcribe/Gemini', {
+                const response = await fetch('https://aicrafters-audio-api.vercel.app/Transcribe/Gemini', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
