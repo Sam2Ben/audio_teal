@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <title>Audio Processing API Documentation</title>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    line-height: 1.6;
+                    max-width: 1000px;
+                    margin: 0 auto;
+                    padding: 40px;
+                    color: #2d3436;
+                    background-color: #f7f9fc;
+                }
+                h1 { 
+                    color: #2d3436;
+                    border-bottom: 3px solid #00b894;
+                    padding-bottom: 15px;
+                    margin-bottom: 30px;
+                }
+                h2 { 
+                    color: #0984e3;
+                    margin-top: 30px;
+                }
+                h3 { 
+                    color: #00b894;
+                    margin-top: 25px;
+                }
+                code {
+                    background: #2d3436;
+                    color: #dfe6e9;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-family: 'Courier New', monospace;
+                }
+                .endpoint {
+                    background: white;
+                    padding: 25px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }
+                .method {
+                    background: #00b894;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    font-weight: 500;
+                }
+                pre {
+                    background: #2d3436;
+                    padding: 15px;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                }
+                pre code {
+                    background: transparent;
+                    padding: 0;
+                }
+                .demo-button {
+                    background-color: #00b894;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                }
+                ul {
+                    padding-left: 20px;
+                }
+                li {
+                    margin: 10px 0;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>🎤 Audio Processing API Documentation</h1>
+            <p>Welcome to the Audio Processing API documentation! This API allows you to process audio files using AI analysis with Gemini 2.0. Below are the details on how to use the API.</p>
+            <p>To get started, you can use the API to transcribe audio files, analyze their content, and much more. The API is designed to be simple and efficient, allowing you to integrate audio processing capabilities into your applications seamlessly.</p>
+            <p>For any questions or support, feel free to reach out to us!</p>
+
+            <br>
+
+            <div class="endpoint">
+                <h2>🌐 Base URL</h2>
+                <p>The API is accessible at:</p>
+                <pre><code>http://audio-app.vercel.app</code></pre>
+            </div>
+
+
+            <div class="endpoint">
+                <h2>📌 API Endpoints</h2>
+                <h3><span class="method">POST</span> /Transcribe/Gemini</h3>    
+                <p>Process audio files using AI analysis with Gemini 2.0</p>
+                
+                <h4>📋 Request Specifications:</h4>
+                <ul>
+                    <li>Content-Type: application/json</li>
+                    <li>Max body size: 50MB</li>
+                </ul>
+
+                <h4>📤 Request Body:</h4>
+                <ul>
+                    <li><code>audio</code>: Base64 encoded audio file (MP3 format required)</li>
+                    <li><code>prompt</code>: Text prompt to guide the AI analysis</li>
+                </ul>
+
+                <h4>📥 Response Format:</h4>
+                <ul>
+                    <li>Success (200):
+                        <pre><code>{"summary": "AI analysis result"}</code></pre>
+                          </li>
+                         <li>Error (400/500):
+                        <pre><code>{"error": "Error message"}</code></pre>
+                          </li>
+                </ul>
+
+                                            
+            <div class="endpoint">
+                <h2>🚀 Try it Now</h2>
+                <button onclick="window.location.href='/demo'" class="demo-button">
+                    Launch Demo
+                </button>
+            </div>
+                    
+
+            
+
+            <h2>💻 Example Implementation</h2>
+            <pre><code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Audio Transcription&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        #transcription {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 100px;
+        }
+        .status {
+            color: #666;
+            font-style: italic;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Audio Transcription Service&lt;/h1&gt;
+    
+    &lt;div class=&quot;controls&quot;&gt;
+        &lt;button id=&quot;startRecording&quot;&gt;Start Recording&lt;/button&gt;
+        &lt;button id=&quot;stopRecording&quot; disabled&gt;Stop Recording&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;status&quot; id=&quot;status&quot;&gt;Ready to record&lt;/div&gt;
+    
+    &lt;div id=&quot;transcription&quot;&gt;&lt;/div&gt;
+
+    &lt;script&gt;
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById('startRecording').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const base64Audio = await blobToBase64(audioBlob);
+                    await sendAudioToServer(base64Audio);
+                };
+
+                mediaRecorder.start();
+                document.getElementById('status').textContent = 'Recording...';
+                document.getElementById('startRecording').disabled = true;
+                document.getElementById('stopRecording').disabled = false;
+                audioChunks = [];
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                document.getElementById('status').textContent = 'Error accessing microphone';
+            }
+        });
+
+        document.getElementById('stopRecording').addEventListener('click', () => {
+            mediaRecorder.stop();
+            document.getElementById('status').textContent = 'Processing audio...';
+            document.getElementById('startRecording').disabled = false;
+            document.getElementById('stopRecording').disabled = true;
+        });
+
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function sendAudioToServer(base64Audio) {
+
+            const message = document.getElementById('promptInput').value || "Transcribe this audio, and use multi-languages if detected, and return only the clean multi-langueges transcription, no more, no less and no other text, and no explanation, and no translation, and no summary, and no other information, just the transcription.";
+
+            try {
+                const response = await fetch('http://audio-app.vercel.app/Transcribe/Gemini', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ audio: base64Audio , prompt: "Transcribe the audio" })
+                });
+
+                const data = await response.json();
+                
+                console.log('Transcription response:', data);
+                
+                // Extract the text from the response object
+                const transcriptionText = data.summary.parts[0].text;
+                
+                document.getElementById('transcription').textContent = transcriptionText;
+                document.getElementById('status').textContent = 'Transcription complete';
+              
+            } catch (error) {
+                console.error('Error sending audio to server:', error);
+                document.getElementById('status').textContent = 'Error sending audio to server';
+            }
+        }
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+            </code></pre>
+
+         
+        </body>
+        </html>`
