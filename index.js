@@ -38,7 +38,7 @@ app.use((_req, res, next) => {
 app.use(express.static('public'));
 
 // Process audio endpoint for Azure
-async function transcribeWithAzureWhisper(audioBuffer) {
+async function transcribeWithAzureWhisper(audioBuffer, prompt) {
     const apiKey = process.env.AZURE_OPENAI_KEY;
     const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
     const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
@@ -53,6 +53,7 @@ async function transcribeWithAzureWhisper(audioBuffer) {
     });
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'text');
+    formData.append('prompt', prompt || '');
     const headers = {
         'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
         'Authorization': `Bearer ${apiKey}`
@@ -167,6 +168,8 @@ app.post('/Transcribe/Azure', async (req, res) => {
     try {
         const { audio } = req.body;
 
+        const { prompt } = req.body;
+
         if (!audio) {
             return res.status(400).json({ error: 'No audio data received' });
         }
@@ -176,7 +179,7 @@ app.post('/Transcribe/Azure', async (req, res) => {
         const audioBuffer = Buffer.from(base64Data, 'base64');
 
         // Transcribe the audio
-        const transcription = await transcribeWithAzureWhisper(audioBuffer);
+        const transcription = await transcribeWithAzureWhisper(audioBuffer, prompt);
 
         res.json({ transcription });
 
