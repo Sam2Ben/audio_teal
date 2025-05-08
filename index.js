@@ -125,7 +125,6 @@ async function ProcessAudioOpenAI(req, res) {
         // Remove the data:audio/mp3;base64, prefix if present
         const base64Data = audio.replace(/^data:audio\/\w+;base64,/, '');
         const audioBuffer = Buffer.from(base64Data, 'base64');
-
         // Direct OpenAI Whisper API call using fetch
         const openaiEndpoint = 'https://api.openai.com/v1/audio/transcriptions';
         const formData = new FormData();
@@ -135,11 +134,12 @@ async function ProcessAudioOpenAI(req, res) {
         });
         formData.append('model', 'whisper-1');
         formData.append('response_format', 'text');
+        formData.append('prompt', req.body.prompt || ''); // Optional prompt
 
         const response = await fetch(openaiEndpoint, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body: formData
         });

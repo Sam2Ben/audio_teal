@@ -83,6 +83,9 @@
             <button id="startRecording">🎤 Start Recording</button>
             <button id="stopRecording" disabled>⏹️ Stop Recording</button>
 
+            <input type="text" id="promptInput" placeholder="Enter custom prompt" value="Transcribe this audio" style="padding: 10px; margin: 10px; border-radius: 4px; border: 1px solid #ddd; width: 300px;">
+       
+
         </div>
 
         <div class="status" id="status">Ready to record</div>
@@ -142,13 +145,15 @@
 
         async function sendAudioToServer(base64Audio) {
 
+            const message = document.getElementById('promptInput').value || "Transcribe this audio, and use multi-languages if detected, and return only the clean multi-langueges transcription, no more, no less and no other text, and no explanation, and no translation, and no summary, and no other information, just the transcription.";
+
              try {
                 const response = await fetch('/Transcribe/OpenAI', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ audio: base64Audio })
+                    body: JSON.stringify({ audio: base64Audio , prompt: message })
                 });
 
                 const data = await response.json();
