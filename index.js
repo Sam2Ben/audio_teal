@@ -3,6 +3,7 @@ import express from 'express';
 import { GoogleGenAI } from "@google/genai";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import FormData from 'form-data';
@@ -112,6 +113,51 @@ async function ProcessAudioGemini(req, res) {
     }
 }
 
+// Process audio endpoint for OpenAI
+async function ProcessAudioOpenAI(req, res) {
+    try {
+        const { audio } = req.body;
+
+        if (!audio) {
+            return res.status(400).json({ error: 'No audio data received' });
+        }
+
+        // Remove the data:audio/mp3;base64, prefix if present
+        const base64Data = audio.replace(/^data:audio\/\w+;base64,/, '');
+        const audioBuffer = Buffer.from(base64Data, 'base64');
+
+        // Direct OpenAI Whisper API call using fetch
+        const openaiEndpoint = 'https://api.openai.com/v1/audio/transcriptions';
+        const formData = new FormData();
+        formData.append('file', audioBuffer, {
+            filename: 'audio.mp3',
+            contentType: 'audio/mpeg'
+        });
+        formData.append('model', 'whisper-1');
+        formData.append('response_format', 'text');
+
+        const response = await fetch(openaiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        console.log(text);
+        res.json({ transcription: text });
+
+    } catch (error) {
+        console.error('Error processing audio:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+}
+
 
 // Route for Gemini
 app.post('/Transcribe/Gemini', ProcessAudioGemini);
@@ -140,6 +186,9 @@ app.post('/Transcribe/Azure', async (req, res) => {
     }
 });
 
+// Route for OpenAI
+app.post('/Transcribe/OpenAI', ProcessAudioOpenAI);
+
 
 
 app.get('/', (_req, res) => {
@@ -152,6 +201,10 @@ app.get('/azuredemo', (_req, res) => {
 
 app.get('/geminidemo', (_req, res) => {
     res.sendFile(__dirname + '/geminidemo.html');
+});
+
+app.get('/openaidemo', (_req, res) => {
+    res.sendFile(__dirname + '/openaidemo.html');
 });
 
 
