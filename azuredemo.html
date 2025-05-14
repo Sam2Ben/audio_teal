@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<div class="controls"></div>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -83,7 +83,10 @@
             <button id="startRecording">🎤 Start Recording</button>
             <button id="stopRecording" disabled>⏹️ Stop Recording</button>
             <input type="text" id="promptInput" placeholder="Enter custom prompt" value="Transcribe this audio" style="padding: 10px; margin: 10px; border-radius: 4px; border: 1px solid #ddd; width: 300px;">
-       
+            <div style="margin: 20px 0;">
+                <input type="file" id="audioFile" accept="audio/*" style="margin: 10px;">
+                <button id="uploadAudio">📤 Upload Audio</button>
+            </div>
         </div>
 
         <div class="status" id="status">Ready to record</div>
@@ -129,6 +132,25 @@
             document.getElementById('stopRecording').disabled = true;
         });
 
+        document.getElementById('uploadAudio').addEventListener('click', async () => {
+            const fileInput = document.getElementById('audioFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                document.getElementById('status').textContent = 'Please select an audio file';
+                return;
+            }
+
+            try {
+                document.getElementById('status').textContent = 'Processing audio file...';
+                const base64Audio = await fileToBase64(file);
+                await sendAudioToServer(base64Audio, file.type);
+            } catch (error) {
+                console.error('Error processing audio file:', error);
+                document.getElementById('status').textContent = 'Error processing audio file';
+            }
+        });
+
         function blobToBase64(blob) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -141,8 +163,19 @@
             });
         }
 
-        async function sendAudioToServer(base64Audio) {
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
+        async function sendAudioToServer(base64Audio, mimeType = 'audio/wav') {
             const message = document.getElementById('promptInput').value || "Transcribe this audio, and use multi-languages if detected, and return only the clean multi-languages transcription, no more, no less and no other text, and no explanation, and no translation, and no summary, and no other information, just the transcription.";
            
             try {
@@ -151,7 +184,11 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ audio: base64Audio , prompt: message })
+                    body: JSON.stringify({ 
+                        audio: base64Audio,
+                        prompt: message,
+                        mimeType: mimeType
+                    })
                 });
 
                 const data = await response.json();
@@ -172,3 +209,5 @@
     </script>
 </body>
 </html>
+
+
