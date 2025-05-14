@@ -198,15 +198,15 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/azuredemo', (_req, res) => {
-    res.sendFile(__dirname + '/azuredemo.html');
+    res.sendFile(__dirname + '/public/azuredemo.html');
 });
 
 app.get('/geminidemo', (_req, res) => {
-    res.sendFile(__dirname + '/geminidemo.html');
+    res.sendFile(__dirname + '/public/geminidemo.html');
 });
 
 app.get('/openaidemo', (_req, res) => {
-    res.sendFile(__dirname + '/openaidemo.html');
+    res.sendFile(__dirname + '/public/openaidemo.html');
 });
 
 
